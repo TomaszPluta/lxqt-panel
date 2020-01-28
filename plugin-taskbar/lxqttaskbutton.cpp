@@ -48,6 +48,8 @@
 #include <QStylePainter>
 #include <QStyleOptionToolButton>
 #include <QDesktopWidget>
+#include <QScreen>
+
 
 #include "lxqttaskbutton.h"
 #include "lxqttaskgroup.h"
@@ -59,6 +61,9 @@
 #include <QX11Info>
 
 bool LXQtTaskButton::sDraggging = false;
+
+#include "iostream" //remove before merge
+
 
 /************************************************
 
@@ -533,6 +538,29 @@ void LXQtTaskButton::moveApplicationToDesktop()
     KWindowSystem::setOnDesktop(mWindow, desk);
 }
 
+
+void LXQtTaskButton::moveApplicationToMonitor()
+{
+	  const auto allScreens = QApplication::screens();
+	    for(QScreen* screen : allScreens)
+	    {
+	        std::cout<<"screen found\n"<<std::endl;
+	    }
+
+
+    QAction* act = qobject_cast<QAction*>(sender());
+    if (!act)
+        return;
+
+    bool ok;
+    int desk = act->data().toInt(&ok);
+
+    if (!ok)
+        return;
+
+    KWindowSystem::setOnDesktop(mWindow, desk);
+}
+
 /************************************************
 
  ************************************************/
@@ -639,6 +667,11 @@ void LXQtTaskButton::contextMenuEvent(QContextMenuEvent* event)
         a->setEnabled(curDesk != winDesk);
         connect(a, SIGNAL(triggered(bool)), this, SLOT(moveApplicationToDesktop()));
     }
+
+    /********** MoveToMonitor **********/
+    a = menu->addAction(tr("&To Other Monitor"));
+    a->setEnabled(true);
+    connect(a, SIGNAL(triggered(bool)), this, SLOT(moveApplicationToMonitor()));
 
     /********** Move/Resize **********/
     menu->addSeparator();

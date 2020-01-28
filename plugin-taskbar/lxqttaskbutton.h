@@ -95,6 +95,7 @@ public slots:
     void closeApplication();
     void moveApplicationToDesktop();
     void moveApplication();
+    void moveApplicationToMonitor();
     void resizeApplication();
     void setApplicationLayer();
 
